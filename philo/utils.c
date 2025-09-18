@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:52:51 by anktiri           #+#    #+#             */
-/*   Updated: 2025/07/07 21:40:11 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/17 19:22:46 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,33 @@ void	message(int a)
 	message_2(a);
 }
 
+int	ft_atoi(char *str)
+{
+	long 	res;
+	int		sign;
+	int		a;
+
+	res = 0;
+	sign =  1;
+	a = 0;
+	while (str[a] == ' ' || (str[a] >= 9 && str[a] <= 13))
+		a++;
+	if (str[a] == '-' || str[a] == '+')
+	{
+		if (str[a] == '-')
+			sign = -1;
+		a++;
+	}
+	while (str[a] >= '0' && str[a] <= '9')
+	{
+		res = res * 10 + (str[a] - '0');
+		a++;
+		if (res > INT_MAX)
+			return (0);
+	}
+	return (res * sign);
+}
+
 int	check_args(int ac, char **av)
 {
 	int	nb_philo;
@@ -65,16 +92,24 @@ int	check_args(int ac, char **av)
 
 	if (ac < 5 || ac > 6)
 		return (message(1), 1);
-	nb_philo = atoi(av[1]);
-	time_to_die = atoi(av[2]);
-	time_to_eat = atoi(av[3]);
-	time_to_sleep = atoi(av[4]);
+	nb_philo = ft_atoi(av[1]);
+	time_to_die = ft_atoi(av[2]);
+	time_to_eat = ft_atoi(av[3]);
+	time_to_sleep = ft_atoi(av[4]);
+	meals_count = -1;
 	if (ac == 6)
-		meals_count = atoi(av[5]);
-	else
-		meals_count = -1;
+		meals_count = ft_atoi(av[5]);
 	if (nb_philo <= 0 || nb_philo > 200 || time_to_die <= 0 || 
 		time_to_eat <= 0 || time_to_sleep <= 0 || (ac == 6 && meals_count < 0))
 		return (message(0), 1);
 	return (0);
+}
+
+long	get_time(void)
+{
+	struct	timeval	timeval;
+
+	if (gettimeofday(&timeval, NULL) == -1)
+		return (-1);
+	return ((timeval.tv_sec * 1000) + (timeval.tv_usec / 1000));
 }
