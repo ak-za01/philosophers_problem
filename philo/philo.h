@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:41:05 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/14 18:36:11 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/22 16:20:22 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ int		check_args(int ac, char **av);
 int		ft_init(t_engine *engine, char **av);
 int		ft_atoi(char *str);
 long	get_time(void);
-
+int		start_engine(t_engine *engine);
+void	routine(void *arg);
+void	check_engine(void *arg);
 
 #endif
