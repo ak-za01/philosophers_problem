@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/25 17:00:40 by anktiri           #+#    #+#             */
+/*   Updated: 2025/09/25 17:01:13 by anktiri          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	init_engine_args(t_engine *engine, char **av)
@@ -17,7 +29,7 @@ int	init_engine_args(t_engine *engine, char **av)
 	return (0);
 }
 
-void init_philosophers(t_engine *engine)
+void	init_philosophers(t_engine *engine)
 {
 	int	a;
 
@@ -28,8 +40,10 @@ void init_philosophers(t_engine *engine)
 		engine->philos[a].left_fork = &engine->forks[a];
 		engine->philos[a].right_fork = NULL;
 		if (engine->philo_count > 1)
-			engine->philos[a].right_fork = &engine->forks[(a + 1) % engine->philo_count];
+			engine->philos[a].right_fork = 
+				&engine->forks[(a + 1) % engine->philo_count];
 		engine->philos[a].meals_eaten = 0;
+		pthread_mutex_init(&engine->philos[a].meal_time_lock, NULL);
 		engine->philos[a].last_meal_time = engine->start_time;
 		engine->philos[a].engine = engine;
 		a++;
@@ -47,11 +61,11 @@ int	mutex_init(t_engine *engine)
 			return (1);
 	}
 	if (pthread_mutex_init(&engine->meal_lock, NULL) != 0)
-			return (1);
+		return (1);
 	if (pthread_mutex_init(&engine->death_lock, NULL) != 0)
-			return (1);
+		return (1);
 	if (pthread_mutex_init(&engine->print_lock, NULL) != 0)
-			return (1);
+		return (1);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:52:51 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/17 19:22:46 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/25 17:18:55 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,53 +16,81 @@ void	message_2(int a)
 {
 	if (a)
 	{
-		printf("╚═══════ WARNING: INCORRECT ARGS MAY RESULT IN PHILOSOPHICAL CHAOS ═══════╝\n");
+		printf("╚═══════ WARNING: INCORRECT ARGS MAY RESULT IN PHILOSOPHI\
+CAL CHAOS ═══════╝\n");
 		return ;
 	}
-	printf("╠════════════════ PHILOSOPHER SURVIVAL GUIDE ═════════════════════════════╣\n");
-	printf("║                                                                         ║\n");
-	printf("║  Remember: Philosophers need time to eat, think, and sleep!             ║\n");
-	printf("║                                                                         ║\n");
-	printf("║  • time_to_die      : How long before starvation (milliseconds)         ║\n");
-	printf("║  • time_to_eat      : Duration of eating session (milliseconds)         ║\n");
-	printf("║  • time_to_sleep    : How long philosophers rest (milliseconds)         ║\n");
-	printf("║  • meals_count    : Optional - stop after N meals per philosopher       ║\n");
-	printf("║                                                                         ║\n");
-	printf("║  Example: ./philo 5 800 200 200 7                                       ║\n");
-	printf("║       5 philosophers, die in 800ms, eat 200ms, sleep 200ms, 7 meals     ║\n");
-	printf("║                                                                         ║\n");
-	printf("╚═══════ WARNING: INCORRECT ARGS MAY RESULT IN PHILOSOPHICAL CHAOS ═══════╝\n");
+	printf("╠════════════════ PHILOSOPHER SURVIVAL GUIDE ════════════════\
+═════════════╣\n");
+	printf("║                                                            \
+             ║\n");
+	printf("║  Remember: Philosophers need time to eat, think, and sleep!\
+             ║\n");
+	printf("║                                                            \
+             ║\n");
+	printf("║  • time_to_die      : How long before starvation (milliseco\
+nds)         ║\n");
+	printf("║  • time_to_eat      : Duration of eating session (milliseco\
+nds)         ║\n");
+	printf("║  • time_to_sleep    : How long philosophers rest (milliseco\
+nds)         ║\n");
+	printf("║  • meals_count    : Optional - stop after N meals per philo\
+sopher       ║\n");
+	printf("║                                                            \
+             ║\n");
+	printf("║  Example: ./philo 5 800 200 200 7                          \
+             ║\n");
+	printf("║       5 philosophers, die in 800ms, eat 200ms, sleep 200ms,\
+ 7 meals     ║\n");
+	printf("║                                                            \
+             ║\n");
+	printf("╚═══════ WARNING: INCORRECT ARGS MAY RESULT IN PHILOSOPHICAL \
+CHAOS ═══════╝\n");
 	printf("\033[0m\n");
 }
 
 void	message(int a)
 {
 	printf("\033[1;37m\n");
-	printf("╔══════════════ PHILOSOPHERS: DINING & DYING SIMULATOR ═══════════════════╗\n");
-	printf("║                                                                         ║\n");
-	printf("║  Usage: ./philo [number_of_philosophers] [time_to_die] [time_to_eat]    ║\n");
-	printf("║                 [time_to_sleep] [number_of_times_each_must_eat]         ║\n");
-	printf("║                                                                         ║\n");
-	printf("║  Arguments (all required except last):                                  ║\n");
-	printf("║    - number_of_philosophers : How many thinkers join the table (1-200)  ║\n");
-	printf("║    - time_to_die           : Death timer in milliseconds (> 0)          ║\n");
-	printf("║    - time_to_eat           : Eating duration in milliseconds (> 0)      ║\n");
-	printf("║    - time_to_sleep         : Sleeping duration in milliseconds (> 0)    ║\n");
-	printf("║    - meals_count           : [OPTIONAL] Stop after N meals per philo    ║\n");
-	printf("║                                                                         ║\n");
-	printf("║  Note: All times are in milliseconds, all values must be positive       ║\n");
-	printf("║                                                                         ║\n");
+	printf("╔══════════════ PHILOSOPHERS: DINING & DYING SIMULATOR ══════\
+═════════════╗\n");
+	printf("║                                                            \
+             ║\n");
+	printf("║  Usage: ./philo [number_of_philosophers] [time_to_die] [tim\
+e_to_eat]    ║\n");
+	printf("║                 [time_to_sleep] [number_of_times_each_must_\
+eat]         ║\n");
+	printf("║                                                            \
+             ║\n");
+	printf("║  Arguments (all required except last):                     \
+             ║\n");
+	printf("║    - number_of_philosophers : How many thinkers join the ta\
+ble (1-200)  ║\n");
+	printf("║    - time_to_die           : Death timer in milliseconds (>\
+ 0)          ║\n");
+	printf("║    - time_to_eat           : Eating duration in millisecond\
+s (> 0)      ║\n");
+	printf("║    - time_to_sleep         : Sleeping duration in milliseco\
+nds (> 0)    ║\n");
+	printf("║    - meals_count           : [OPTIONAL] Stop after N meals \
+per philo    ║\n");
+	printf("║                                                            \
+             ║\n");
+	printf("║  Note: All times are in milliseconds, all values must be po\
+sitive       ║\n");
+	printf("║                                                            \
+             ║\n");
 	message_2(a);
 }
 
 int	ft_atoi(char *str)
 {
-	long 	res;
+	long	res;
 	int		sign;
 	int		a;
 
 	res = 0;
-	sign =  1;
+	sign = 1;
 	a = 0;
 	while (str[a] == ' ' || (str[a] >= 9 && str[a] <= 13))
 		a++;
@@ -107,7 +135,7 @@ int	check_args(int ac, char **av)
 
 long	get_time(void)
 {
-	struct	timeval	timeval;
+	struct timeval	timeval;
 
 	if (gettimeofday(&timeval, NULL) == -1)
 		return (-1);

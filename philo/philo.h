@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:41:05 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/25 13:31:49 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/25 17:02:49 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <stdlib.h>
 # include <string.h>
 
-typedef struct s_engine t_engine;
+typedef struct s_engine	t_engine;
 
 typedef struct s_time
 {
@@ -31,18 +31,19 @@ typedef struct s_time
 	size_t	sleep;
 }	t_time;
 
-typedef	struct s_philo
+typedef struct s_philo
 {
 	int					id;
 	pthread_t			thread_id;
 	pthread_mutex_t		*left_fork;
 	pthread_mutex_t		*right_fork;
+	pthread_mutex_t		meal_time_lock;
 	int					meals_eaten;
 	long				last_meal_time;
 	t_engine			*engine;
 }	t_philo;
 
-typedef	struct	s_engine
+typedef struct s_engine
 {
 	int					philo_count;
 	t_time				time;
@@ -66,10 +67,9 @@ int		cleanup_exit(t_engine *engine, int status);
 int		start_engine(t_engine *engine);
 void	*philosophers_routine(void *arg);
 void	*check_engine(void *arg);
-int		single_philosopher(t_engine *engine);
 void	print_status(t_philo *philo, char *status);
 bool	simulation_should_end(t_engine *engine);
-int		ft_usleep(long milliseconds);
+int		ft_usleep(long milliseconds, t_engine *engine);
 int		eats(t_philo *philo);
 
 #endif
