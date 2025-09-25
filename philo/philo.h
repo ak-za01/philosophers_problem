@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:41:05 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/22 16:20:22 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/25 13:31:49 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 # include <sys/time.h>
 # include <stdlib.h>
 # include <string.h>
+
+typedef struct s_engine t_engine;
 
 typedef struct s_time
 {
@@ -52,7 +54,7 @@ typedef	struct	s_engine
 	pthread_mutex_t		print_lock;
 	pthread_t			monitor;
 	int					philos_finished;
-	long				start_time; 
+	long				start_time;
 	bool				someone_died;
 }	t_engine;
 
@@ -60,8 +62,14 @@ int		check_args(int ac, char **av);
 int		ft_init(t_engine *engine, char **av);
 int		ft_atoi(char *str);
 long	get_time(void);
+int		cleanup_exit(t_engine *engine, int status);
 int		start_engine(t_engine *engine);
-void	routine(void *arg);
-void	check_engine(void *arg);
+void	*philosophers_routine(void *arg);
+void	*check_engine(void *arg);
+int		single_philosopher(t_engine *engine);
+void	print_status(t_philo *philo, char *status);
+bool	simulation_should_end(t_engine *engine);
+int		ft_usleep(long milliseconds);
+int		eats(t_philo *philo);
 
 #endif

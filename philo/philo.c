@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 17:44:07 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/22 14:15:19 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/25 14:25:25 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ int	main(int ac, char **av)
 	memset(&engine, 0, sizeof(t_engine));
 	if (ft_init(&engine, av) != 0)
 		return (cleanup_exit(&engine, 1));
+	if (engine.philo_count == 1)
+		return (single_philosopher(&engine));
 	if (start_engine(&engine))
 		return (cleanup_exit(&engine, 1));
 	return (cleanup_exit(&engine, 0));

@@ -30,7 +30,7 @@ void init_philosophers(t_engine *engine)
 		if (engine->philo_count > 1)
 			engine->philos[a].right_fork = &engine->forks[(a + 1) % engine->philo_count];
 		engine->philos[a].meals_eaten = 0;
-		engine->philos[a].last_meal_time = get_time();
+		engine->philos[a].last_meal_time = engine->start_time;
 		engine->philos[a].engine = engine;
 		a++;
 	}
