@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
+#ifndef PHILO_BONUS_H
+# define PHILO_BONUS_H
 
 # include <limits.h>
 # include <pthread.h>
@@ -21,6 +21,7 @@
 # include <sys/time.h>
 # include <stdlib.h>
 # include <string.h>
+#include <semaphore.h>
 
 typedef struct s_engine	t_engine;
 

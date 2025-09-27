@@ -5,8 +5,7 @@ CC = cc
 # FLAGS = -Wall -Wextra -Werror -pthread
 FLAGS = -pthread
 
-SRCS =  philo.c init.c sim.c utils.c  actions.c\
-		# utils2.c
+SRCS =  philo_bonus.c init_bonus.c sim_bonus.c utils_bonus.c  actions_bonus.c\
 
 OBJS = $(SRCS:.c=.o)
 
@@ -15,7 +14,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CC) $(FLAGS) -o $(NAME) $(OBJS)
 
-%.o: %.c philo.h
+%.o: %.c philo_bonus.h
 	$(CC) $(FLAGS) -c $< -o $@
 
 clean:

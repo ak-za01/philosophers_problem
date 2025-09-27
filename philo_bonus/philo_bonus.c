@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 void	destroy_mutexes(t_engine *engine)
 {
@@ -42,13 +42,13 @@ int	cleanup_exit(t_engine *engine, int status)
 }
 void ff()
 {
-	system("leaks -q philo");
+	system("leaks -q philo_bonus");
 }
 int	main(int ac, char **av)
 {
 	t_engine	engine;
 
-	atexit(ff);
+	// atexit(ff);
 	if (check_args(ac, av) != 0)
 		return (1);
 	memset(&engine, 0, sizeof(t_engine));
