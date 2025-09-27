@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:00:40 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/27 XX:XX:XX by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/27 17:19:06 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,17 +47,12 @@ void	init_philosophers(t_engine *engine)
 
 int	init_semaphores(t_engine *engine)
 {
-	// Unlink any existing semaphores first
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
-	sem_unlink(SEM_DEATH);
-	sem_unlink(SEM_MEALS);
-
-	// Create semaphores
-	engine->forks = sem_open(SEM_FORKS, O_CREAT | O_EXCL, 0644, engine->philo_count);
+	engine->forks = sem_open(SEM_FORKS, O_CREAT | O_EXCL, 0644,
+			engine->philo_count);
 	if (engine->forks == SEM_FAILED)
 		return (1);
-
 	engine->print_sem = sem_open(SEM_PRINT, O_CREAT | O_EXCL, 0644, 1);
 	if (engine->print_sem == SEM_FAILED)
 	{
@@ -65,29 +60,6 @@ int	init_semaphores(t_engine *engine)
 		sem_unlink(SEM_FORKS);
 		return (1);
 	}
-
-	engine->death_sem = sem_open(SEM_DEATH, O_CREAT | O_EXCL, 0644, 0);
-	if (engine->death_sem == SEM_FAILED)
-	{
-		sem_close(engine->forks);
-		sem_close(engine->print_sem);
-		sem_unlink(SEM_FORKS);
-		sem_unlink(SEM_PRINT);
-		return (1);
-	}
-
-	engine->meal_count_sem = sem_open(SEM_MEALS, O_CREAT | O_EXCL, 0644, 1);
-	if (engine->meal_count_sem == SEM_FAILED)
-	{
-		sem_close(engine->forks);
-		sem_close(engine->print_sem);
-		sem_close(engine->death_sem);
-		sem_unlink(SEM_FORKS);
-		sem_unlink(SEM_PRINT);
-		sem_unlink(SEM_DEATH);
-		return (1);
-	}
-
 	return (0);
 }
 
@@ -103,33 +75,20 @@ void	cleanup_semaphores(t_engine *engine)
 		sem_close(engine->print_sem);
 		sem_unlink(SEM_PRINT);
 	}
-	if (engine->death_sem)
-	{
-		sem_close(engine->death_sem);
-		sem_unlink(SEM_DEATH);
-	}
-	if (engine->meal_count_sem)
-	{
-		sem_close(engine->meal_count_sem);
-		sem_unlink(SEM_MEALS);
-	}
 }
 
 int	ft_init(t_engine *engine, char **av)
 {
 	if (init_engine_args(engine, av))
 		return (1);
-		
 	engine->philos = malloc(engine->philo_count * sizeof(t_philo));
 	if (!engine->philos)
 		return (1);
-		
 	if (init_semaphores(engine))
 	{
 		free(engine->philos);
 		return (1);
 	}
-	
 	init_philosophers(engine);
 	return (0);
 }

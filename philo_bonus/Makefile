@@ -5,7 +5,8 @@ CC = cc
 # FLAGS = -Wall -Wextra -Werror -pthread
 FLAGS = -pthread
 
-SRCS =  philo_bonus.c init_bonus.c sim_bonus.c utils_bonus.c  actions_bonus.c\
+SRCS =  philo_bonus.c init_bonus.c sim_bonus.c utils_bonus.c\
+		actions_bonus.c sim_utils_bonus.c
 
 OBJS = $(SRCS:.c=.o)
 
