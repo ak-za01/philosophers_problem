@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
+/*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:00:40 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/25 17:01:13 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/27 XX:XX:XX by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,63 +31,105 @@ int	init_engine_args(t_engine *engine, char **av)
 
 void	init_philosophers(t_engine *engine)
 {
-	int	a;
+	int	i;
 
-	a = 0;
-	while (a < engine->philo_count)
+	i = 0;
+	while (i < engine->philo_count)
 	{
-		engine->philos[a].id = a + 1;
-		engine->philos[a].left_fork = &engine->forks[a];
-		engine->philos[a].right_fork = NULL;
-		if (engine->philo_count > 1)
-			engine->philos[a].right_fork = 
-				&engine->forks[(a + 1) % engine->philo_count];
-		engine->philos[a].meals_eaten = 0;
-		pthread_mutex_init(&engine->philos[a].meal_time_lock, NULL);
-		engine->philos[a].last_meal_time = engine->start_time;
-		engine->philos[a].engine = engine;
-		a++;
+		engine->philos[i].id = i + 1;
+		engine->philos[i].pid = 0;
+		engine->philos[i].meals_eaten = 0;
+		engine->philos[i].last_meal_time = engine->start_time;
+		engine->philos[i].engine = engine;
+		i++;
 	}
 }
 
-int	mutex_init(t_engine *engine)
+int	init_semaphores(t_engine *engine)
 {
-	int	a;
+	// Unlink any existing semaphores first
+	sem_unlink(SEM_FORKS);
+	sem_unlink(SEM_PRINT);
+	sem_unlink(SEM_DEATH);
+	sem_unlink(SEM_MEALS);
 
-	a = -1;
-	while (++a < engine->philo_count)
+	// Create semaphores
+	engine->forks = sem_open(SEM_FORKS, O_CREAT | O_EXCL, 0644, engine->philo_count);
+	if (engine->forks == SEM_FAILED)
+		return (1);
+
+	engine->print_sem = sem_open(SEM_PRINT, O_CREAT | O_EXCL, 0644, 1);
+	if (engine->print_sem == SEM_FAILED)
 	{
-		if (pthread_mutex_init(&engine->forks[a], NULL) != 0)
-			return (1);
+		sem_close(engine->forks);
+		sem_unlink(SEM_FORKS);
+		return (1);
 	}
-	if (pthread_mutex_init(&engine->meal_lock, NULL) != 0)
+
+	engine->death_sem = sem_open(SEM_DEATH, O_CREAT | O_EXCL, 0644, 0);
+	if (engine->death_sem == SEM_FAILED)
+	{
+		sem_close(engine->forks);
+		sem_close(engine->print_sem);
+		sem_unlink(SEM_FORKS);
+		sem_unlink(SEM_PRINT);
 		return (1);
-	if (pthread_mutex_init(&engine->death_lock, NULL) != 0)
+	}
+
+	engine->meal_count_sem = sem_open(SEM_MEALS, O_CREAT | O_EXCL, 0644, 1);
+	if (engine->meal_count_sem == SEM_FAILED)
+	{
+		sem_close(engine->forks);
+		sem_close(engine->print_sem);
+		sem_close(engine->death_sem);
+		sem_unlink(SEM_FORKS);
+		sem_unlink(SEM_PRINT);
+		sem_unlink(SEM_DEATH);
 		return (1);
-	if (pthread_mutex_init(&engine->print_lock, NULL) != 0)
-		return (1);
+	}
+
 	return (0);
+}
+
+void	cleanup_semaphores(t_engine *engine)
+{
+	if (engine->forks)
+	{
+		sem_close(engine->forks);
+		sem_unlink(SEM_FORKS);
+	}
+	if (engine->print_sem)
+	{
+		sem_close(engine->print_sem);
+		sem_unlink(SEM_PRINT);
+	}
+	if (engine->death_sem)
+	{
+		sem_close(engine->death_sem);
+		sem_unlink(SEM_DEATH);
+	}
+	if (engine->meal_count_sem)
+	{
+		sem_close(engine->meal_count_sem);
+		sem_unlink(SEM_MEALS);
+	}
 }
 
 int	ft_init(t_engine *engine, char **av)
 {
 	if (init_engine_args(engine, av))
 		return (1);
-	engine->forks = malloc(engine->philo_count * sizeof(pthread_mutex_t));
-	if (!engine->forks)
-		return (1);
+		
 	engine->philos = malloc(engine->philo_count * sizeof(t_philo));
 	if (!engine->philos)
-	{
-		free(engine->forks);
 		return (1);
-	}
-	if (mutex_init(engine))
+		
+	if (init_semaphores(engine))
 	{
-		free(engine->forks);
 		free(engine->philos);
 		return (1);
 	}
+	
 	init_philosophers(engine);
 	return (0);
 }

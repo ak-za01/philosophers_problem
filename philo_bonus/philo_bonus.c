@@ -12,49 +12,29 @@
 
 #include "philo_bonus.h"
 
-void	destroy_mutexes(t_engine *engine)
-{
-	int	a;
-
-	a = 0;
-	if (engine->forks)
-	{
-		while (a < engine->philo_count)
-		{
-			pthread_mutex_destroy(&engine->forks[a]);
-			pthread_mutex_destroy(&engine->philos[a].meal_time_lock);
-			a++;
-		}
-	}
-	pthread_mutex_destroy(&engine->meal_lock);
-	pthread_mutex_destroy(&engine->death_lock);
-	pthread_mutex_destroy(&engine->print_lock);
-}
-
 int	cleanup_exit(t_engine *engine, int status)
 {
-	destroy_mutexes(engine);
+	cleanup_semaphores(engine);  // Changed from destroy_mutexes()
 	if (engine->philos)
 		free(engine->philos);
-	if (engine->forks)
-		free(engine->forks);
-	return (status);
+		return (status);
 }
 void ff()
 {
 	system("leaks -q philo_bonus");
 }
+	
 int	main(int ac, char **av)
 {
 	t_engine	engine;
-
+	
 	// atexit(ff);
 	if (check_args(ac, av) != 0)
 		return (1);
 	memset(&engine, 0, sizeof(t_engine));
 	if (ft_init(&engine, av) != 0)
 		return (cleanup_exit(&engine, 1));
-	if (start_engine(&engine))
+	if (start_simulation(&engine))  // Changed from start_engine()
 		return (cleanup_exit(&engine, 1));
 	return (cleanup_exit(&engine, 0));
 }

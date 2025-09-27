@@ -1,105 +1,156 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sim.c                                              :+:      :+:    :+:   */
+/*   sim_bonus.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:20:20 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/25 17:09:52 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/27 XX:XX:XX by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-void	*philosophers_routine(void *arg)
+void	print_status(t_philo *philo, char *status)
 {
-	t_philo	*philo;
+	long	timestamp;
 
-	philo = (t_philo *)arg;
-	if (philo->id % 2 == 0)
-	{
-		print_status(philo, "is sleeping");
-		ft_usleep(philo->engine->time.sleep, philo->engine);
-	}
-	while (!simulation_should_end(philo->engine))
-	{
-		print_status(philo, "is thinking");
-		if (simulation_should_end(philo->engine))
-			break ;
-		if (eats(philo))
-			break ;
-		print_status(philo, "is sleeping");
-		if (ft_usleep(philo->engine->time.sleep, philo->engine) == 1)
-			break ;
-	}
-	return (NULL);
+	sem_wait(philo->engine->print_sem);
+	timestamp = get_time() - philo->engine->start_time;
+	printf("%ld %d %s\n", timestamp, philo->id, status);
+	if (strcmp(status, "died") != 0)
+		sem_post(philo->engine->print_sem);
 }
 
-void	*check_engine(void *arg)
+int	philo_eats(t_philo *philo)
 {
-	t_engine	*engine;
-	long		current_time;
-	int			a;
-
-	engine = (t_engine *)arg;
-	while (!simulation_should_end(engine))
+	// Take two forks from the semaphore
+	sem_wait(philo->engine->forks);
+	print_status(philo, "has taken a fork");
+	sem_wait(philo->engine->forks);
+	print_status(philo, "has taken a fork");
+	
+	// Eat
+	print_status(philo, "is eating");
+	philo->last_meal_time = get_time();
+	philo->meals_eaten++;
+	ft_usleep(philo->engine->time.eat);
+	
+	// Put forks back
+	sem_post(philo->engine->forks);
+	sem_post(philo->engine->forks);
+	
+	// Check if finished eating required meals
+	if (philo->engine->meals_required > 0 && 
+		philo->meals_eaten >= philo->engine->meals_required)
 	{
-		current_time = ((a = -1), get_time());
-		while (++a < engine->philo_count)
+		sem_wait(philo->engine->meal_count_sem);
+		philo->engine->philos_finished++;
+		if (philo->engine->philos_finished >= philo->engine->philo_count)
 		{
-			pthread_mutex_lock(&engine->philos[a].meal_time_lock);
-			if (current_time - engine->philos[a].last_meal_time 
-				> (long)engine->time.die)
-			{
-				print_status(&engine->philos[a], "died");
-				pthread_mutex_lock(&engine->death_lock);
-				engine->someone_died = true;
-				pthread_mutex_unlock(&engine->philos[a].meal_time_lock);
-				return (pthread_mutex_unlock(&engine->death_lock), NULL);
-			}
-			pthread_mutex_unlock(&engine->philos[a].meal_time_lock);
+			sem_post(philo->engine->death_sem); // Signal simulation end
+		}
+		sem_post(philo->engine->meal_count_sem);
+		return (1);
+	}
+	return (0);
+}
+
+void	philo_sleeps(t_philo *philo)
+{
+	print_status(philo, "is sleeping");
+	ft_usleep(philo->engine->time.sleep);
+}
+
+void	philo_thinks(t_philo *philo)
+{
+	print_status(philo, "is thinking");
+}
+
+void	*death_monitor(void *arg)
+{
+	t_philo	*philo;
+	long	current_time;
+
+	philo = (t_philo *)arg;
+	while (1)
+	{
+		current_time = get_time();
+		if (current_time - philo->last_meal_time > (long)philo->engine->time.die)
+		{
+			print_status(philo, "died");
+			sem_post(philo->engine->death_sem);
+			return (NULL);
 		}
 		usleep(1000);
 	}
 	return (NULL);
 }
 
-int	start_engine(t_engine *engine)
+void	philosopher_process(t_philo *philo)
 {
-	int	a;
+	pthread_t	monitor_thread;
 
-	a = -1;
-	while (++a < engine->philo_count)
+	// Create death monitor thread for this philosopher
+	if (pthread_create(&monitor_thread, NULL, death_monitor, philo) != 0)
+		exit(1);
+	pthread_detach(monitor_thread);
+
+	// Stagger start for even philosophers
+	if (philo->id % 2 == 0)
 	{
-		if (pthread_create(&engine->philos[a].thread_id, NULL, 
-				philosophers_routine, &engine->philos[a]))
-		{
-			printf("Error: Failed to create philosopher thread %d\n", a + 1);
-			return (1);
-		}
+		philo_sleeps(philo);
 	}
-	if (pthread_create(&engine->monitor, NULL, check_engine, engine))
+
+	while (1)
 	{
-		printf("Error: Failed to create monitor thread \n");
-		return (1);
+		philo_thinks(philo);
+		if (philo_eats(philo))
+			break;
+		philo_sleeps(philo);
 	}
-	pthread_join(engine->monitor, NULL);
-	a = -1;
-	while (++a < engine->philo_count)
-		pthread_join(engine->philos[a].thread_id, NULL);
-	return (0);
+	exit(0);
 }
 
-void	print_status(t_philo *philo, char *status)
+int	start_simulation(t_engine *engine)
 {
-	long	timestamp;
+	int		i;
+	int		status;
+	pid_t	wpid;
 
-	pthread_mutex_lock(&philo->engine->print_lock);
-	if (!simulation_should_end(philo->engine))
+	// Create philosopher processes
+	i = 0;
+	while (i < engine->philo_count)
 	{
-		timestamp = get_time() - philo->engine->start_time;
-		printf("%ld %d %s\n", timestamp, philo->id, status);
+		engine->philos[i].pid = fork();
+		if (engine->philos[i].pid == 0)
+		{
+			// Child process - become philosopher
+			philosopher_process(&engine->philos[i]);
+		}
+		else if (engine->philos[i].pid < 0)
+		{
+			printf("Error: Failed to create philosopher process %d\n", i + 1);
+			return (1);
+		}
+		i++;
 	}
-	pthread_mutex_unlock(&philo->engine->print_lock);
+
+	// Main process waits for death signal or completion
+	sem_wait(engine->death_sem);
+
+	// Kill all philosopher processes
+	i = 0;
+	while (i < engine->philo_count)
+	{
+		kill(engine->philos[i].pid, SIGTERM);
+		i++;
+	}
+
+	// Wait for all processes to terminate
+	while ((wpid = waitpid(-1, &status, WNOHANG)) > 0)
+		continue;
+
+	return (0);
 }
