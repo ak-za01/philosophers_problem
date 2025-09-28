@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:52:33 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/27 17:28:19 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/09/28 13:44:46 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,6 @@ int	philo_eats(t_philo *philo)
 	sem_post(philo->engine->forks);
 	if (philo->engine->meals_required > 0
 		&& philo->meals_eaten >= philo->engine->meals_required)
-	{
 		exit(0);
-	}
 	return (0);
 }
