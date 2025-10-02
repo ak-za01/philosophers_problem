@@ -6,7 +6,7 @@
 /*   By: anktiri <anktiri@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:52:51 by anktiri           #+#    #+#             */
-/*   Updated: 2025/09/25 17:18:55 by anktiri          ###   ########.fr       */
+/*   Updated: 2025/10/02 14:14:08 by anktiri          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,8 @@ int	ft_atoi(char *str)
 		if (res > INT_MAX)
 			return (0);
 	}
+	if (str[a])
+		return (-1);
 	return (res * sign);
 }
 
